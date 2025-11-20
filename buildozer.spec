@@ -13,7 +13,7 @@ source.include_exts = py,png,jpg,kv,atlas
 version = 0.1
 
 # --- REQUISITOS (Versiones estables para GitHub Actions) ---
-requirements = python3,kivy==2.2.1,kivymd==1.1.1,requests,urllib3,chardet,idna,pillow
+requirements = python3,kivy==2.2.1,kivymd==1.1.1,requests,urllib3,chardet,idna
 
 # Pantalla
 orientation = portrait
@@ -34,4 +34,5 @@ android.allow_backup = True
 
 [buildozer]
 log_level = 2
+
 warn_on_root = 1

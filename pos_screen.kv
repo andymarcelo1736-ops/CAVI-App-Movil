@@ -1,0 +1,180 @@
+#:kivy 2.0.0
+
+# --- NUEVO: Diseño de una fila dentro del Carrito (Ventana Emergente) ---
+<CartItem>:
+    size_hint_y: None
+    height: "70dp"
+    padding: "10dp"
+    spacing: "10dp"
+    md_bg_color: 0.96, 0.96, 0.96, 1
+    radius: [12,]
+
+    # 1. Botón para eliminar ítem
+    MDIconButton:
+        icon: "delete-outline"
+        theme_text_color: "Error"
+        pos_hint: {"center_y": .5}
+        on_release: root.remove_item()
+
+    # 2. Información del Producto (Nombre y Subtotal)
+    MDBoxLayout:
+        orientation: 'vertical'
+        pos_hint: {"center_y": .5}
+        spacing: "2dp"
+        
+        MDLabel:
+            text: root.product_name
+            bold: True
+            font_style: "Subtitle2"
+            shorten: True
+            shorten_from: 'right'
+            size_hint_y: None
+            height: self.texture_size[1]
+        
+        MDLabel:
+            text: root.product_total
+            font_style: "Caption"
+            theme_text_color: "Primary"
+            size_hint_y: None
+            height: self.texture_size[1]
+
+    # 3. Controles de Cantidad (- 1 +)
+    MDBoxLayout:
+        adaptive_width: True
+        spacing: "8dp"
+        pos_hint: {"center_y": .5}
+
+        MDIconButton:
+            icon: "minus-circle-outline"
+            theme_text_color: "Custom"
+            text_color: 0.4, 0.4, 0.4, 1
+            pos_hint: {"center_y": .5}
+            on_release: root.decrease_qty()
+
+        MDLabel:
+            text: str(root.quantity)
+            halign: "center"
+            bold: True
+            font_style: "H6"
+            size_hint_x: None
+            width: "20dp"
+            pos_hint: {"center_y": .5}
+
+        MDIconButton:
+            icon: "plus-circle-outline"
+            theme_text_color: "Primary"
+            pos_hint: {"center_y": .5}
+            on_release: root.increase_qty()
+
+# --- Diseño de los ítems en la lista principal de productos ---
+<ProductListItem>:
+    IconLeftWidget:
+        icon: "food-fork-drink"
+        theme_text_color: "Custom"
+        text_color: app.theme_cls.primary_color
+
+# --- Pantalla Principal ---
+<PosScreen>:
+    MDBoxLayout:
+        orientation: 'vertical'
+        md_bg_color: 1, 1, 1, 1 
+
+        # --- 1. BARRA SUPERIOR ---
+        MDTopAppBar:
+            title: "CAVI | Toma de Pedidos"
+            elevation: 2
+            right_action_items: [["refresh", lambda x: root.load_products(None)]]
+            md_bg_color: app.theme_cls.primary_color
+            specific_text_color: 1, 1, 1, 1
+
+        # --- 2. ÁREA DE BÚSQUEDA ---
+        MDBoxLayout:
+            adaptive_height: True
+            padding: "15dp"
+            spacing: "10dp"
+            md_bg_color: 0.96, 0.96, 0.96, 1 
+
+            MDIconButton:
+                icon: "magnify"
+                pos_hint: {"center_y": .5}
+                theme_text_color: "Hint"
+
+            MDTextField:
+                id: search_field
+                hint_text: "Buscar producto..."
+                mode: "fill"
+                fill_color_normal: 1, 1, 1, 1
+                active_line: False 
+                radius: [15, 15, 15, 15] 
+                on_text: root.filter_list(self.text)
+                pos_hint: {"center_y": .5}
+
+        # --- 3. LISTA DE PRODUCTOS ---
+        MDScrollView:
+            do_scroll_x: False
+            do_scroll_y: True
+            
+            MDList:
+                id: container_productos
+                padding: "10dp"
+                spacing: "8dp"
+
+        # --- 4. BARRA INFERIOR (TOTALES Y BOTONES) ---
+        MDCard:
+            size_hint_y: None
+            height: "100dp"
+            radius: [25, 25, 0, 0]
+            elevation: 4
+            md_bg_color: 0.98, 0.98, 0.98, 1
+            padding: "15dp"
+            spacing: "10dp"
+
+            # Columna Izquierda: Totales
+            MDBoxLayout:
+                orientation: 'vertical'
+                size_hint_x: 0.4
+                pos_hint: {"center_y": .5}
+                
+                MDLabel:
+                    text: "Total:"
+                    font_style: "Caption"
+                    theme_text_color: "Secondary"
+                
+                MDLabel:
+                    text: root.total_text
+                    font_style: "H5"
+                    theme_text_color: "Custom"
+                    text_color: 0, 0, 0, 1
+                    bold: True
+                
+                MDLabel:
+                    text: root.cart_info
+                    font_style: "Overline"
+                    theme_text_color: "Hint"
+
+            # Columna Derecha: Botones de Acción
+            MDBoxLayout:
+                orientation: 'horizontal'
+                size_hint_x: 0.6
+                spacing: "8dp"
+                pos_hint: {"center_y": .5}
+                
+                # Botón VER CARRITO (Gris)
+                MDFillRoundFlatButton:
+                    text: "VER CARRITO"
+                    font_style: "Button"
+                    font_size: "13sp"
+                    size_hint_x: 0.5
+                    md_bg_color: 0.4, 0.4, 0.4, 1
+                    pos_hint: {"center_y": .5}
+                    on_release: root.open_cart_dialog()
+
+                # Botón ENVIAR (Color Principal)
+                MDFillRoundFlatButton:
+                    text: "ENVIAR"
+                    font_style: "Button"
+                    font_size: "14sp"
+                    size_hint_x: 0.5
+                    pos_hint: {"center_y": .5}
+                    md_bg_color: app.theme_cls.primary_color
+                    on_release: root.send_order()

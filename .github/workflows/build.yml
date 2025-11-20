@@ -8,42 +8,20 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Actualizado a v4
       - uses: actions/checkout@v4
 
-      # Corrección de sintaxis para variables de entorno (GITHUB_OUTPUT)
-      - name: Get Date
-        id: get-date
-        run: |
-          echo "date=$(/bin/date -u "+%Y%m%d")" >> $GITHUB_OUTPUT
-        shell: bash
-
-      # Actualizado a v4
-      - name: Cache Buildozer global directory
-        uses: actions/cache@v4
-        with:
-          path: .buildozer_global
-          key: buildozer-global-${{ hashFiles('buildozer.spec') }}
-
-      # Actualizado a v4
-      - name: Cache Buildozer directory
-        uses: actions/cache@v4
-        with:
-          path: .buildozer
-          key: ${{ runner.os }}-${{ steps.get-date.outputs.date }}-${{ hashFiles('buildozer.spec') }}
-
-      # Ejecuta la compilación
+      # Usamos esta acción que es más estable y no da el error de 'user'
       - name: Build with Buildozer
-        uses: ArtemSBulgakov/buildozer-action@v1
+        uses: HeaTTheatR/Buildozer-action@v1.2
         id: buildozer
         with:
           command: buildozer android debug
           buildozer_version: master
 
-      # Actualizado a v4 (Sube el archivo resultante)
+      # Subir el artefacto (APK)
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: package
-          path: ${{ steps.buildozer.outputs.filename }}
+          path: bin/*.apk
           if-no-files-found: error
